@@ -1,0 +1,5 @@
+com\finance\manager\service\CategoryServiceTest.class
+com\finance\manager\service\SavingsGoalServiceTest.class
+com\finance\manager\service\AuthServiceTest.class
+com\finance\manager\service\impl\ReportServiceTest.class
+com\finance\manager\service\TransactionServiceTest.class

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Personal Finance Manager</a> &gt; <a href="index.source.html" class="el_package">com.finance.manager.controller</a> &gt; <span class="el_source">ReportController.java</span></div><h1>ReportController.java</h1><pre class="source lang-java linenums">package com.finance.manager.controller;
+
+import com.finance.manager.dto.response.ResponseDTOs.*;
+import com.finance.manager.exception.BadRequestException;
+import com.finance.manager.service.impl.ReportService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Provides monthly and yearly financial reports.
+ */
+@RestController
+@RequestMapping(&quot;/api/reports&quot;)
+@RequiredArgsConstructor
+public class ReportController {
+
+    private final ReportService reportService;
+
+    /**
+     * Returns a monthly financial report for a given year and month.
+     */
+    @GetMapping(&quot;/monthly/{year}/{month}&quot;)
+    public ResponseEntity&lt;MonthlyReportResponse&gt; monthly(@PathVariable int year,
+                                                          @PathVariable int month) {
+<span class="nc bnc" id="L26" title="All 4 branches missed.">        if (month &lt; 1 || month &gt; 12) {</span>
+<span class="nc" id="L27">            throw new BadRequestException(&quot;Month must be between 1 and 12&quot;);</span>
+        }
+<span class="nc" id="L29">        return ResponseEntity.ok(reportService.getMonthlyReport(year, month));</span>
+    }
+
+    /**
+     * Returns a yearly financial report for a given year.
+     */
+    @GetMapping(&quot;/yearly/{year}&quot;)
+    public ResponseEntity&lt;YearlyReportResponse&gt; yearly(@PathVariable int year) {
+<span class="nc" id="L37">        return ResponseEntity.ok(reportService.getYearlyReport(year));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

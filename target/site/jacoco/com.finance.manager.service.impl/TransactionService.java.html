@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TransactionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Personal Finance Manager</a> &gt; <a href="index.source.html" class="el_package">com.finance.manager.service.impl</a> &gt; <span class="el_source">TransactionService.java</span></div><h1>TransactionService.java</h1><pre class="source lang-java linenums">package com.finance.manager.service.impl;
+
+import com.finance.manager.dto.request.TransactionRequest;
+import com.finance.manager.dto.request.UpdateTransactionRequest;
+import com.finance.manager.dto.response.ResponseDTOs.*;
+import com.finance.manager.entity.CategoryType;
+import com.finance.manager.entity.Transaction;
+import com.finance.manager.entity.User;
+import com.finance.manager.exception.BadRequestException;
+import com.finance.manager.exception.ResourceNotFoundException;
+import com.finance.manager.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class TransactionService {
+
+    private final TransactionRepository transactionRepository;
+    private final CategoryService categoryService;
+
+    public TransactionResponse createTransaction(TransactionRequest request) {
+<span class="fc" id="L27">        User user = categoryService.getCurrentUser();</span>
+
+        // Date cannot be future
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (request.getDate().isAfter(LocalDate.now())) {</span>
+<span class="fc" id="L31">            throw new BadRequestException(&quot;Transaction date cannot be in the future&quot;);</span>
+        }
+
+        // Validate category
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (!categoryService.isCategoryValid(request.getCategory(), user)) {</span>
+<span class="fc" id="L36">            throw new BadRequestException(&quot;Invalid category: &quot; + request.getCategory());</span>
+        }
+
+<span class="fc" id="L39">        CategoryType type = categoryService.getCategoryType(request.getCategory(), user);</span>
+
+<span class="fc" id="L41">        Transaction transaction = Transaction.builder()</span>
+<span class="fc" id="L42">                .amount(request.getAmount())</span>
+<span class="fc" id="L43">                .date(request.getDate())</span>
+<span class="fc" id="L44">                .category(request.getCategory())</span>
+<span class="fc" id="L45">                .type(type)</span>
+<span class="fc" id="L46">                .description(request.getDescription())</span>
+<span class="fc" id="L47">                .user(user)</span>
+<span class="fc" id="L48">                .build();</span>
+
+<span class="fc" id="L50">        Transaction saved = transactionRepository.save(transaction);</span>
+<span class="fc" id="L51">        return toResponse(saved);</span>
+    }
+
+    public TransactionListResponse getTransactions(LocalDate startDate, LocalDate endDate, String category) {
+<span class="fc" id="L55">        User user = categoryService.getCurrentUser();</span>
+
+        // If category filter provided, validate it
+<span class="fc" id="L58">        String categoryFilter = null;</span>
+<span class="pc bpc" id="L59" title="3 of 4 branches missed.">        if (category != null &amp;&amp; !category.isBlank()) {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (!categoryService.isCategoryValid(category, user)) {</span>
+<span class="nc" id="L61">                throw new BadRequestException(&quot;Invalid category: &quot; + category);</span>
+            }
+<span class="nc" id="L63">            categoryFilter = category;</span>
+        }
+
+<span class="fc" id="L66">        List&lt;Transaction&gt; transactions = transactionRepository.findByUserIdWithFilters(</span>
+<span class="fc" id="L67">                user.getId(), startDate, endDate, categoryFilter);</span>
+
+<span class="fc" id="L69">        return new TransactionListResponse(transactions.stream()</span>
+<span class="fc" id="L70">                .map(this::toResponse)</span>
+<span class="fc" id="L71">                .collect(Collectors.toList()));</span>
+    }
+
+    public TransactionResponse updateTransaction(Long id, UpdateTransactionRequest request) {
+<span class="fc" id="L75">        User user = categoryService.getCurrentUser();</span>
+
+<span class="fc" id="L77">        Transaction transaction = transactionRepository.findByIdAndUserId(id, user.getId())</span>
+<span class="fc" id="L78">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Transaction not found with id: &quot; + id));</span>
+
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (request.getAmount() != null) {</span>
+<span class="fc" id="L81">            transaction.setAmount(request.getAmount());</span>
+        }
+
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (request.getCategory() != null) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            if (!categoryService.isCategoryValid(request.getCategory(), user)) {</span>
+<span class="nc" id="L86">                throw new BadRequestException(&quot;Invalid category: &quot; + request.getCategory());</span>
+            }
+<span class="nc" id="L88">            CategoryType type = categoryService.getCategoryType(request.getCategory(), user);</span>
+<span class="nc" id="L89">            transaction.setCategory(request.getCategory());</span>
+<span class="nc" id="L90">            transaction.setType(type);</span>
+        }
+
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">        if (request.getDescription() != null) {</span>
+<span class="nc" id="L94">            transaction.setDescription(request.getDescription());</span>
+        }
+
+<span class="fc" id="L97">        Transaction saved = transactionRepository.save(transaction);</span>
+<span class="fc" id="L98">        return toResponse(saved);</span>
+    }
+
+    public MessageResponse deleteTransaction(Long id) {
+<span class="fc" id="L102">        User user = categoryService.getCurrentUser();</span>
+
+<span class="fc" id="L104">        Transaction transaction = transactionRepository.findByIdAndUserId(id, user.getId())</span>
+<span class="fc" id="L105">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Transaction not found with id: &quot; + id));</span>
+
+<span class="fc" id="L107">        transactionRepository.delete(transaction);</span>
+<span class="fc" id="L108">        return MessageResponse.builder().message(&quot;Transaction deleted successfully&quot;).build();</span>
+    }
+
+    private TransactionResponse toResponse(Transaction t) {
+<span class="fc" id="L112">        return TransactionResponse.builder()</span>
+<span class="fc" id="L113">                .id(t.getId())</span>
+<span class="fc" id="L114">                .amount(t.getAmount())</span>
+<span class="fc" id="L115">                .date(t.getDate())</span>
+<span class="fc" id="L116">                .category(t.getCategory())</span>
+<span class="fc" id="L117">                .description(t.getDescription())</span>
+<span class="fc" id="L118">                .type(t.getType())</span>
+<span class="fc" id="L119">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

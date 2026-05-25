@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Personal Finance Manager</a> &gt; <a href="index.source.html" class="el_package">com.finance.manager.controller</a> &gt; <span class="el_source">AuthController.java</span></div><h1>AuthController.java</h1><pre class="source lang-java linenums">package com.finance.manager.controller;
+
+import com.finance.manager.dto.request.LoginRequest;
+import com.finance.manager.dto.request.RegisterRequest;
+import com.finance.manager.dto.response.ResponseDTOs.*;
+import com.finance.manager.service.impl.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Handles user authentication: registration, login, and logout.
+ */
+@RestController
+@RequestMapping(&quot;/api/auth&quot;)
+@RequiredArgsConstructor
+public class AuthController {
+
+    private final AuthService authService;
+
+    /**
+     * Checks authentication status or provides a simple health check for the auth API.
+     */
+    @GetMapping(&quot;/status&quot;)
+    public ResponseEntity&lt;String&gt; status() {
+<span class="nc" id="L29">        return ResponseEntity.ok(&quot;Auth API is reachable. Use POST for login/register/logout.&quot;);</span>
+    }
+
+    /**
+     * Registers a new user account.
+     */
+    @PostMapping(&quot;/register&quot;)
+    public ResponseEntity&lt;RegisterResponse&gt; register(@Valid @RequestBody RegisterRequest request) {
+<span class="nc" id="L37">        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));</span>
+    }
+
+    /**
+     * Authenticates a user and creates a session.
+     */
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;MessageResponse&gt; login(@Valid @RequestBody LoginRequest request,
+                                                  HttpServletRequest httpRequest) {
+<span class="nc" id="L46">        return ResponseEntity.ok(authService.login(request, httpRequest));</span>
+    }
+
+    /**
+     * Invalidates the current user session.
+     */
+    @PostMapping(&quot;/logout&quot;)
+    public ResponseEntity&lt;MessageResponse&gt; logout(HttpServletRequest request) {
+<span class="nc" id="L54">        return ResponseEntity.ok(authService.logout(request));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

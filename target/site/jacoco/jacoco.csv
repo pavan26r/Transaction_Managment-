@@ -1,0 +1,22 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Personal Finance Manager,com.finance.manager.exception,BadRequestException,0,4,0,0,0,1,0,1,0,1
+Personal Finance Manager,com.finance.manager.exception,ForbiddenException,0,4,0,0,0,1,0,1,0,1
+Personal Finance Manager,com.finance.manager.exception,ConflictException,0,4,0,0,0,1,0,1,0,1
+Personal Finance Manager,com.finance.manager.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+Personal Finance Manager,com.finance.manager.exception,GlobalExceptionHandler,74,0,0,0,16,0,7,0,7,0
+Personal Finance Manager,com.finance.manager.entity,CategoryType,0,15,0,0,0,3,0,1,0,1
+Personal Finance Manager,com.finance.manager.entity,DefaultCategory,26,95,4,4,3,15,3,5,1,3
+Personal Finance Manager,com.finance.manager,PersonalFinanceManagerApplication,8,0,0,0,3,0,2,0,2,0
+Personal Finance Manager,com.finance.manager.controller,ReportController,24,0,4,0,4,0,4,0,2,0
+Personal Finance Manager,com.finance.manager.controller,GoalController,32,0,0,0,5,0,5,0,5,0
+Personal Finance Manager,com.finance.manager.controller,CategoryController,19,0,0,0,3,0,3,0,3,0
+Personal Finance Manager,com.finance.manager.controller,AuthController,24,0,0,0,4,0,4,0,4,0
+Personal Finance Manager,com.finance.manager.controller,TransactionController,29,0,0,0,4,0,4,0,4,0
+Personal Finance Manager,com.finance.manager.security,CustomUserDetailsService,24,0,0,0,6,0,2,0,2,0
+Personal Finance Manager,com.finance.manager.dto.response,ResponseDTOs,3,0,0,0,1,0,1,0,1,0
+Personal Finance Manager,com.finance.manager.config,SecurityConfig,101,0,0,0,23,0,9,0,9,0
+Personal Finance Manager,com.finance.manager.service.impl,AuthService,0,92,0,4,0,27,0,5,0,3
+Personal Finance Manager,com.finance.manager.service.impl,CategoryService,43,177,4,10,7,43,6,11,4,6
+Personal Finance Manager,com.finance.manager.service.impl,ReportService,0,142,0,2,0,34,0,4,0,3
+Personal Finance Manager,com.finance.manager.service.impl,SavingsGoalService,50,263,12,12,6,63,13,9,2,8
+Personal Finance Manager,com.finance.manager.service.impl,TransactionService,49,188,10,8,9,46,7,9,0,7

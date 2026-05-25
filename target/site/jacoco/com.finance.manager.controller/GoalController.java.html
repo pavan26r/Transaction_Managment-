@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoalController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Personal Finance Manager</a> &gt; <a href="index.source.html" class="el_package">com.finance.manager.controller</a> &gt; <span class="el_source">GoalController.java</span></div><h1>GoalController.java</h1><pre class="source lang-java linenums">package com.finance.manager.controller;
+
+import com.finance.manager.dto.request.GoalRequest;
+import com.finance.manager.dto.request.UpdateGoalRequest;
+import com.finance.manager.dto.response.ResponseDTOs.*;
+import com.finance.manager.service.impl.SavingsGoalService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Manages savings goals for the authenticated user.
+ */
+@RestController
+@RequestMapping(&quot;/api/goals&quot;)
+@RequiredArgsConstructor
+public class GoalController {
+
+    private final SavingsGoalService goalService;
+
+    /**
+     * Creates a new savings goal.
+     */
+    @PostMapping
+    public ResponseEntity&lt;GoalResponse&gt; create(@Valid @RequestBody GoalRequest request) {
+<span class="nc" id="L28">        return ResponseEntity.status(HttpStatus.CREATED).body(goalService.createGoal(request));</span>
+    }
+
+    /**
+     * Returns all savings goals for the authenticated user.
+     */
+    @GetMapping
+    public ResponseEntity&lt;GoalListResponse&gt; getAll() {
+<span class="nc" id="L36">        return ResponseEntity.ok(goalService.getAllGoals());</span>
+    }
+
+    /**
+     * Returns a specific savings goal by ID.
+     */
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;GoalResponse&gt; getById(@PathVariable Long id) {
+<span class="nc" id="L44">        return ResponseEntity.ok(goalService.getGoal(id));</span>
+    }
+
+    /**
+     * Updates a savings goal's target amount or date.
+     */
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;GoalResponse&gt; update(@PathVariable Long id,
+                                                @Valid @RequestBody UpdateGoalRequest request) {
+<span class="nc" id="L53">        return ResponseEntity.ok(goalService.updateGoal(id, request));</span>
+    }
+
+    /**
+     * Deletes a savings goal.
+     */
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;MessageResponse&gt; delete(@PathVariable Long id) {
+<span class="nc" id="L61">        return ResponseEntity.ok(goalService.deleteGoal(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SavingsGoalService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Personal Finance Manager</a> &gt; <a href="index.source.html" class="el_package">com.finance.manager.service.impl</a> &gt; <span class="el_source">SavingsGoalService.java</span></div><h1>SavingsGoalService.java</h1><pre class="source lang-java linenums">package com.finance.manager.service.impl;
+
+import com.finance.manager.dto.request.GoalRequest;
+import com.finance.manager.dto.request.UpdateGoalRequest;
+import com.finance.manager.dto.response.ResponseDTOs.*;
+import com.finance.manager.entity.CategoryType;
+import com.finance.manager.entity.SavingsGoal;
+import com.finance.manager.entity.User;
+import com.finance.manager.exception.BadRequestException;
+import com.finance.manager.exception.ForbiddenException;
+import com.finance.manager.exception.ResourceNotFoundException;
+import com.finance.manager.repository.SavingsGoalRepository;
+import com.finance.manager.repository.TransactionRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class SavingsGoalService {
+
+    private final SavingsGoalRepository goalRepository;
+    private final TransactionRepository transactionRepository;
+    private final CategoryService categoryService;
+
+    public GoalResponse createGoal(GoalRequest request) {
+<span class="fc" id="L32">        User user = categoryService.getCurrentUser();</span>
+
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (!request.getTargetDate().isAfter(LocalDate.now())) {</span>
+<span class="fc" id="L35">            throw new BadRequestException(&quot;Target date must be in the future&quot;);</span>
+        }
+
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        LocalDate startDate = request.getStartDate() != null ? request.getStartDate() : LocalDate.now();</span>
+
+<span class="fc" id="L40">        SavingsGoal goal = SavingsGoal.builder()</span>
+<span class="fc" id="L41">                .goalName(request.getGoalName())</span>
+<span class="fc" id="L42">                .targetAmount(request.getTargetAmount())</span>
+<span class="fc" id="L43">                .targetDate(request.getTargetDate())</span>
+<span class="fc" id="L44">                .startDate(startDate)</span>
+<span class="fc" id="L45">                .user(user)</span>
+<span class="fc" id="L46">                .build();</span>
+
+<span class="fc" id="L48">        SavingsGoal saved = goalRepository.save(goal);</span>
+<span class="fc" id="L49">        return buildGoalResponse(saved, user);</span>
+    }
+
+    public GoalListResponse getAllGoals() {
+<span class="fc" id="L53">        User user = categoryService.getCurrentUser();</span>
+<span class="fc" id="L54">        List&lt;SavingsGoal&gt; goals = goalRepository.findByUserId(user.getId());</span>
+<span class="fc" id="L55">        return new GoalListResponse(goals.stream()</span>
+<span class="fc" id="L56">                .map(g -&gt; buildGoalResponse(g, user))</span>
+<span class="fc" id="L57">                .collect(Collectors.toList()));</span>
+    }
+
+    public GoalResponse getGoal(Long id) {
+<span class="fc" id="L61">        User user = categoryService.getCurrentUser();</span>
+<span class="fc" id="L62">        SavingsGoal goal = goalRepository.findById(id)</span>
+<span class="fc" id="L63">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Goal not found with id: &quot; + id));</span>
+
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (!goal.getUser().getId().equals(user.getId())) {</span>
+<span class="fc" id="L66">            throw new ForbiddenException(&quot;Access denied to this goal&quot;);</span>
+        }
+
+<span class="nc" id="L69">        return buildGoalResponse(goal, user);</span>
+    }
+
+    public GoalResponse updateGoal(Long id, UpdateGoalRequest request) {
+<span class="fc" id="L73">        User user = categoryService.getCurrentUser();</span>
+<span class="fc" id="L74">        SavingsGoal goal = goalRepository.findById(id)</span>
+<span class="pc" id="L75">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Goal not found with id: &quot; + id));</span>
+
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        if (!goal.getUser().getId().equals(user.getId())) {</span>
+<span class="nc" id="L78">            throw new ForbiddenException(&quot;Access denied to this goal&quot;);</span>
+        }
+
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (request.getTargetAmount() != null) {</span>
+<span class="fc" id="L82">            goal.setTargetAmount(request.getTargetAmount());</span>
+        }
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (request.getTargetDate() != null) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            if (!request.getTargetDate().isAfter(LocalDate.now())) {</span>
+<span class="nc" id="L86">                throw new BadRequestException(&quot;Target date must be in the future&quot;);</span>
+            }
+<span class="nc" id="L88">            goal.setTargetDate(request.getTargetDate());</span>
+        }
+
+<span class="fc" id="L91">        SavingsGoal saved = goalRepository.save(goal);</span>
+<span class="fc" id="L92">        return buildGoalResponse(saved, user);</span>
+    }
+
+    public MessageResponse deleteGoal(Long id) {
+<span class="fc" id="L96">        User user = categoryService.getCurrentUser();</span>
+<span class="fc" id="L97">        SavingsGoal goal = goalRepository.findById(id)</span>
+<span class="pc" id="L98">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Goal not found with id: &quot; + id));</span>
+
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (!goal.getUser().getId().equals(user.getId())) {</span>
+<span class="nc" id="L101">            throw new ForbiddenException(&quot;Access denied to this goal&quot;);</span>
+        }
+
+<span class="fc" id="L104">        goalRepository.delete(goal);</span>
+<span class="fc" id="L105">        return MessageResponse.builder().message(&quot;Goal deleted successfully&quot;).build();</span>
+    }
+
+    private GoalResponse buildGoalResponse(SavingsGoal goal, User user) {
+<span class="fc" id="L109">        BigDecimal totalIncome = transactionRepository.sumByUserIdAndTypeAfterDate(</span>
+<span class="fc" id="L110">                user.getId(), CategoryType.INCOME, goal.getStartDate());</span>
+<span class="fc" id="L111">        BigDecimal totalExpenses = transactionRepository.sumByUserIdAndTypeAfterDate(</span>
+<span class="fc" id="L112">                user.getId(), CategoryType.EXPENSE, goal.getStartDate());</span>
+
+<span class="fc" id="L114">        BigDecimal progress = totalIncome.subtract(totalExpenses);</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (progress.compareTo(BigDecimal.ZERO) &lt; 0) progress = BigDecimal.ZERO;</span>
+
+<span class="fc" id="L117">        BigDecimal target = goal.getTargetAmount();</span>
+<span class="fc" id="L118">        BigDecimal remaining = target.subtract(progress);</span>
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">        if (remaining.compareTo(BigDecimal.ZERO) &lt; 0) remaining = BigDecimal.ZERO;</span>
+
+<span class="fc" id="L121">        double percentage = 0.0;</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        if (target.compareTo(BigDecimal.ZERO) &gt; 0) {</span>
+<span class="fc" id="L123">            percentage = progress.divide(target, 4, RoundingMode.HALF_UP)</span>
+<span class="fc" id="L124">                    .multiply(BigDecimal.valueOf(100))</span>
+<span class="fc" id="L125">                    .doubleValue();</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">            if (percentage &gt; 100.0) percentage = 100.0;</span>
+        }
+
+<span class="fc" id="L129">        return GoalResponse.builder()</span>
+<span class="fc" id="L130">                .id(goal.getId())</span>
+<span class="fc" id="L131">                .goalName(goal.getGoalName())</span>
+<span class="fc" id="L132">                .targetAmount(goal.getTargetAmount())</span>
+<span class="fc" id="L133">                .targetDate(goal.getTargetDate())</span>
+<span class="fc" id="L134">                .startDate(goal.getStartDate())</span>
+<span class="fc" id="L135">                .currentProgress(progress)</span>
+<span class="fc" id="L136">                .progressPercentage(Math.round(percentage * 100.0) / 100.0)</span>
+<span class="fc" id="L137">                .remainingAmount(remaining)</span>
+<span class="fc" id="L138">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
