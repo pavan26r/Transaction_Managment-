@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.finance.manager.service.AuthServiceTest
--------------------------------------------------------------------------------
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.318 s -- in com.finance.manager.service.AuthServiceTest
