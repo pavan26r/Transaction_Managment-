@@ -234,22 +234,7 @@ GET /api/reports/yearly/{year}
 ---
 
 ## 🚀 Deploy on Render
-
-1. Push your code to GitHub
-2. Create a new **Web Service** on [Render](https://render.com)
-3. Connect your GitHub repository
-4. Configure the following:
-   - **Build Command:** `mvn clean package -DskipTests`
-   - **Start Command:** `java -jar target/personal-finance-manager-1.0.0.jar`
-5. Hit Deploy! ✅
-
-Then run the test script:
-```bash
-bash financial_manager_tests.sh https://your-app.onrender.com/api
-```
-
----
-
+LINK(https://transaction-managment-ykcg.onrender.com/)
 ## 📁 Project Structure
 
 ```
