@@ -234,7 +234,7 @@ GET /api/reports/yearly/{year}
 ---
 
 ## 🚀 Deploy on Render
-LINK(https://transaction-managment-ykcg.onrender.com/)
+ (https://transaction-managment-ykcg.onrender.com/api)
 ## 📁 Project Structure
 
 ```
